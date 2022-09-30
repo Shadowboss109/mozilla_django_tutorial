@@ -18,6 +18,10 @@ def index(request):
 
     num_book_ref = Book.objects.filter(title__icontains='book').count()
     num_en_genre = Genre.objects.filter(name__icontains='en').count()
+
+    num_visits = request.session.get('num_visits', 0)
+    request.session['num_visits'] = num_visits + 1
+
     context = {
         'num_books': num_books,
         'num_instances': num_instances,
@@ -25,7 +29,27 @@ def index(request):
         'num_authors': num_authors,
         'num_book_ref':num_book_ref,
         'num_en_genre':num_en_genre,
+
+        'num_visits': num_visits,
     }
 
     # Render the HTML template index.html with the data in the context variable
     return render(request, 'index.html', context=context)
+
+
+from django.views import generic
+
+class BookListView(generic.ListView):
+    model = Book
+    paginate_by = 2
+
+
+class BookDetailView(generic.DetailView):
+    model = Book
+
+class AuthorListView(generic.ListView):
+    model = Author
+    paginate_by = 2
+
+class AuthorDetailView(generic.DetailView):
+    model = Author
